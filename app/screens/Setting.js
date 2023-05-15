@@ -1,0 +1,135 @@
+import { View, Text,Modal,TouchableOpacity,Pressable,Image,StyleSheet,ImageBackground,Dimensions,Platform,Linking,ActivityIndicator,TextInput,ScrollView,FlatList } from 'react-native'
+import React from 'react'
+import colors from '../config/Colors'
+import { RFPercentage as rp, RFValue as rf } from "react-native-responsive-fontsize";
+import { MaterialIcons } from '@expo/vector-icons';
+import { useSelector, useDispatch } from "react-redux";
+import { loginaction, logoutaction } from "../redux/auth/authaction";
+import userimaeg from "../../assets/Images/user.png"
+import * as ImagePicker from 'expo-image-picker';
+import BottomTab from '../components/common/BottomTab';
+import { useIsFocused } from '@react-navigation/native';
+import { AntDesign } from '@expo/vector-icons';
+import Loading from '../components/Loading';
+import app from '../config/firebase';
+import {createUserWithEmailAndPassword,getAuth,deleteUser,updateProfile,sendEmailVerification,signInWithEmailAndPassword} from "firebase/auth"
+import {doc,setDoc,getFirestore, addDoc,getDoc, collection,query,getDocs,serverTimestamp,updateDoc} from "firebase/firestore"
+import { ref,getDownloadURL,getStorage, uploadBytes  } from "firebase/storage"
+
+export default function Setting({navigation}) {
+    const dispatch = useDispatch();
+    const userinfo = useSelector((state) => state?.AuthReducer);
+   
+  const focused=useIsFocused()  
+  const db=getFirestore(app)
+  const auth=getAuth(app)
+  const storage = getStorage(app);
+  const [image, setImage] = React.useState(null);
+  const [isload,setisload]=React.useState(false)
+  const [profiledata,setprofiledata]=React.useState(null)
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+  
+    if (!result.canceled) {
+      const imageUri = result.uri;
+      const userId = userinfo?.currentUser.userid;
+      const storageRef = ref(storage,'giveawayappuserdps/' + userId + "profile +image1"+new Date().toLocaleString());
+            const img = await fetch(result.uri);
+            const bytes = await img.blob();
+            uploadBytes(storageRef, bytes)
+            .then(snapshot => {
+                return getDownloadURL(snapshot.ref)
+            })
+            .then(async(downloadURL) => {
+                await updateDoc(doc(db, "users",userId), {
+                    profilepic: downloadURL,
+                  });
+            }).catch((e)=>{
+                alert("upload failed")
+            })
+      setImage(imageUri);
+    }
+  };
+
+  React.useEffect(() => {
+    setisload(true);
+
+    // Retrieve data from Firestore using user ID as filter
+    const firestore = getFirestore();
+    const userRef = doc(firestore, 'users', userinfo?.currentUser.userid);
+    getDoc(userRef)
+      .then(doc => {
+        if (doc.exists()) {
+          setprofiledata(doc.data());
+        } else {
+        }
+      })
+      .catch(error => {
+        console.error('Error retrieving user data:', error);
+      })
+      .finally(() => {
+        setisload(false);
+      });
+  }, [focused]);
+if(isload)
+{
+  return <Loading/>
+}
+  return (
+    <View style={{flex:1,justifyContent:"space-between",backgroundColor:colors.white}}>
+    <View style={styles.mnonb}>
+      <View style={[styles.centertext,{marginTop:rp(4)}]}>
+          <TouchableOpacity 
+          onPress={pickImage}
+          >
+          <Image style={{height:80,width:80,borderRadius:40}} source={
+            profiledata?.profilepic!==''&&profiledata?.profilepic!==undefined?{uri:profiledata?.profilepic}:userimaeg
+          }
+            />
+          </TouchableOpacity>
+          <Text style={{color:colors.black,fontSize:rp(3),marginTop:rp(1)}}>{userinfo?.currentUser?.name?userinfo?.currentUser?.name:""}</Text>
+          <Text style={{color:colors.black}}>{userinfo?.currentUser?.email?userinfo?.currentUser?.email:""}</Text>
+        </View>
+        <View style={{marginTop:rp(2)}}>
+            <Pressable style={{backgroundColor:colors.black,paddingHorizontal:rp(2),paddingVertical:rp(1.3),borderRadius:rp(1),marginBottom:rp(1),display:"flex",flexDirection:"row",alignItems:"center"}}>
+            <AntDesign name="sharealt" size={24} color={colors.white} />
+              <Text style={{color:colors.white,fontSize:rp(2.3),marginLeft:rp(2)}}>Share</Text>
+            </Pressable>
+         </View>
+      <View style={{marginTop:rp(.5)}}>
+            <Pressable onPress={() => dispatch(logoutaction())}  style={{backgroundColor:colors.black,paddingHorizontal:rp(2),paddingVertical:rp(1.3),borderRadius:rp(1),marginBottom:rp(1),display:"flex",flexDirection:"row",alignItems:"center"}}>
+            <MaterialIcons name="logout" size={24} color={colors.white}/>
+              <Text style={{color:colors.white,fontSize:rp(2.3),marginLeft:rp(2)}}>Logout</Text>
+            </Pressable>
+         </View>
+         
+    </View>
+    <BottomTab/>
+    </View>
+  )
+}
+
+const styles=StyleSheet.create({
+    mnonb:{
+        flex:1,
+        backgroundColor:colors.white,
+        paddingHorizontal:rp(3),
+        paddingVertical:rp(5)
+    },
+    centertext:{
+        display:"flex",
+        alignItems:"center",
+        justifyContent:"center",
+    },
+    btn:{
+        backgroundColor:colors.black,
+        paddingHorizontal:5,
+        paddingVertical:4,
+        borderRadius:5
+    },
+})
