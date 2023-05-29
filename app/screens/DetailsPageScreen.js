@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Platform } from "react-native";
 import { RFPercentage } from "react-native-responsive-fontsize";
-import { LinearGradient } from "expo-linear-gradient";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import MyAppButton from "../components/common/MyAppButton";

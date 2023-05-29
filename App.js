@@ -1,7 +1,7 @@
 import React from "react";
 import { View, ActivityIndicator, LogBox } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
-import { createStackNavigator } from "@react-navigation/stack";
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 //screens
 import WelcomeScreen from "./app/screens/WelcomeScreen";
@@ -21,7 +21,7 @@ import Loading from "./app/components/Loading";
 import { useSelector, useDispatch } from "react-redux";
 import { getCurrentuser } from "./app/redux/auth/authaction";
 
-const Stack = createStackNavigator();
+const Stack = createNativeStackNavigator();
 
 console.disableYellowBox = true;
 

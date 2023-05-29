@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Platform, KeyboardAvoidingView, Button, Image, ActivityIndicator, Pressable } from "react-native";
 import { RFPercentage } from "react-native-responsive-fontsize";
-import { LinearGradient } from "expo-linear-gradient";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import RNPickerSelect from "react-native-picker-select";
@@ -163,14 +162,14 @@ function AddProductScreen(props) {
       <View style={{ marginTop: RFPercentage(4), width: "90%", flexDirection: "row", justifyContent: "center", alignItems: "center", alignSelf: "center" }}>
         {/* Back */}
         <TouchableOpacity activeOpacity={0.8} onPress={() => props.navigation.goBack()} style={{ position: "absolute", left: 0 }}>
-          <LinearGradient
-            colors={["#38EF7D", "#11998E"]}
-            start={[1, 1]}
-            end={[0.5, 0.1]}
-            style={{ justifyContent: "center", alignItems: "center", width: RFPercentage(4), height: RFPercentage(4), borderRadius: RFPercentage(30) }}
+          <View
+            // colors={["#38EF7D", "#11998E"]}
+            // start={[1, 1]}
+            // end={[0.5, 0.1]}
+            style={{ backfaceVisibility:Colors.green,justifyContent: "center", alignItems: "center", width: RFPercentage(4), height: RFPercentage(4), borderRadius: RFPercentage(30) }}
           >
-            <Ionicons name="chevron-back-outline" style={{ fontSize: RFPercentage(3) }} color={Colors.white} />
-          </LinearGradient>
+            <Ionicons name="chevron-back-outline" style={{ fontSize: RFPercentage(3) }} color={Colors.green} />
+          </View>
         </TouchableOpacity>
         <Text style={{ color: Colors.primary, fontSize: RFPercentage(2.3) }}>הוסף מוצר</Text>
       </View>
